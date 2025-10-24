@@ -61,3 +61,7 @@ func TestAppend(t *testing.T) {
 		return
 	}
 }
+
+func TestZip(t *testing.T) {
+	// _ = zw.SetOffet(filesize)
+}
