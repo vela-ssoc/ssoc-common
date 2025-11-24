@@ -49,7 +49,7 @@ func (sm *safeMap) Put(peer Peer) bool {
 		return false
 	}
 
-	host := peer.Host()
+	host := peer.Info().Host
 	sm.mutex.Lock()
 	_, exists := sm.peers[host]
 	if !exists {
@@ -127,7 +127,7 @@ func (sm *shardMap) Put(peer Peer) bool {
 		return false
 	}
 
-	host := peer.Host()
+	host := peer.Info().Host
 	shard := sm.shard(host)
 
 	return shard.Put(peer)

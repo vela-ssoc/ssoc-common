@@ -6,16 +6,22 @@ type Handler interface {
 	Handle(*smux.Session)
 }
 
+type Info struct {
+	ID   int64
+	Inet string
+	Host string
+}
+
 type Peer interface {
-	ID() int64
-	Host() string
+	Info() Info
 	Muxer() *smux.Session
 }
 
-func NewPeer(id int64, sess *smux.Session) Peer {
+func NewPeer(id int64, inet string, sess *smux.Session) Peer {
 	return &tunnelPeer{
 		id:   id,
 		host: formatID(id),
+		inet: inet,
 		sess: sess,
 	}
 }
@@ -23,15 +29,16 @@ func NewPeer(id int64, sess *smux.Session) Peer {
 type tunnelPeer struct {
 	id   int64
 	host string
+	inet string
 	sess *smux.Session
 }
 
-func (tp *tunnelPeer) ID() int64 {
-	return tp.id
-}
-
-func (tp *tunnelPeer) Host() string {
-	return tp.host
+func (tp *tunnelPeer) Info() Info {
+	return Info{
+		ID:   tp.id,
+		Inet: tp.inet,
+		Host: tp.host,
+	}
 }
 
 func (tp *tunnelPeer) Muxer() *smux.Session {
