@@ -16,7 +16,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func NotFound(*ship.Context) error {
+func NotFound(_ *ship.Context) error {
 	return ship.ErrNotFound.Newf("资源不存在")
 }
 

@@ -3,6 +3,7 @@ package problem
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"net"
 	"net/http"
 	"strconv"
@@ -10,7 +11,7 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/vela-ssoc/ssoc-common-mb/validation"
+	"github.com/vela-ssoc/ssoc-common/validation"
 	"github.com/xgfone/ship/v5"
 	"gorm.io/gorm"
 )
@@ -90,7 +91,7 @@ func (h *handle) HandleError(c *ship.Context, e error) {
 		}
 	default:
 		switch {
-		case err == gorm.ErrRecordNotFound:
+		case errors.Is(err, gorm.ErrRecordNotFound):
 			pd.Detail = "数据不存在"
 		}
 	}
