@@ -10,19 +10,19 @@ type Dialer interface {
 	DialContext(ctx context.Context, network, addr string) (net.Conn, error)
 }
 
-func NewMatchedDialer(fallback Dialer, matches ...Dialer) Dialer {
-	return &matchesDialer{
+func NewSelectDialer(fallback Dialer, matches ...Dialer) Dialer {
+	return &selectDialer{
 		matches:  matches,
 		fallback: fallback,
 	}
 }
 
-type matchesDialer struct {
+type selectDialer struct {
 	matches  []Dialer
 	fallback Dialer
 }
 
-func (md *matchesDialer) DialContext(ctx context.Context, network, addr string) (net.Conn, error) {
+func (md *selectDialer) DialContext(ctx context.Context, network, addr string) (net.Conn, error) {
 	for _, d := range md.matches {
 		// 当 conn 和 err 都为 nil 时，表示模式不匹配，尝试下一个 dialer
 		conn, err := d.DialContext(ctx, network, addr)
