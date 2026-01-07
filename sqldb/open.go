@@ -13,14 +13,9 @@ func Open(dsn string, opts ...gorm.Option) (*gorm.DB, error) {
 	// 注意：用该方式区分必须要先用 [mysql.ParseDSN] 才较为稳妥。
 	var dia gorm.Dialector
 	if cfg, err := mysql.ParseDSN(dsn); err == nil && cfg != nil {
-		dia = &gormysql.Dialector{
-			Config: &gormysql.Config{DSN: dsn},
-		}
+		dia = gormysql.Open(dsn)
 	} else {
-		dia = gaussdb.New(gaussdb.Config{
-			DSN:                  dsn,
-			PreferSimpleProtocol: true,
-		})
+		dia = gaussdb.Open(dsn)
 	}
 
 	db, err := gorm.Open(dia, opts...)

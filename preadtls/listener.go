@@ -5,38 +5,56 @@ import (
 	"context"
 	"io"
 	"net"
+	"sync"
 	"sync/atomic"
 	"time"
 )
 
-func NewListener(lis net.Listener, readTimeout time.Duration) *Listener {
-	addr := lis.Addr()
-	ln := &Listener{
-		raw: lis,
-		tcp: &chanListener{
-			conn: make(chan net.Conn),
-			addr: addr,
-			stop: make(chan struct{}),
-		},
-		tls: &chanListener{
-			conn: make(chan net.Conn),
-			addr: addr,
-			stop: make(chan struct{}),
-		},
-		timeout: readTimeout,
+func ListenTCP(addr string, readTimeout time.Duration) (*Listener, error) {
+	raw, err := net.Listen("tcp", addr)
+	if err != nil {
+		return nil, err
 	}
 
-	go func() { _ = ln.Accept() }()
+	master := &Listener{
+		raw:     raw,
+		tcp:     nil,
+		tls:     nil,
+		timeout: readTimeout,
+	}
+	laddr := raw.Addr()
+	tcp := &chanListener{
+		master: master,
+		conn:   make(chan net.Conn),
+		addr:   laddr,
+		stop:   make(chan struct{}),
+		closed: atomic.Bool{},
+	}
+	tls := &chanListener{
+		master: master,
+		conn:   make(chan net.Conn),
+		addr:   laddr,
+		stop:   make(chan struct{}),
+		closed: atomic.Bool{},
+	}
+	subs := map[*chanListener]struct{}{tcp: {}, tls: {}}
+	master.tcp = tcp
+	master.tls = tls
+	master.subs = subs
 
-	return ln
+	go func() { _ = master.Accept() }()
+
+	return master, nil
 }
 
 type Listener struct {
 	raw     net.Listener
 	tcp     *chanListener
 	tls     *chanListener
-	timeout time.Duration
+	timeout time.Duration // 首字节报文等待超时时间。
 	closed  atomic.Bool
+	mutex   sync.Mutex
+	subs    map[*chanListener]struct{}
 }
 
 func (pl *Listener) TCPListener() net.Listener {
@@ -110,7 +128,21 @@ func (pl *Listener) enqueue(conn net.Conn) {
 	}
 }
 
+// close 当子 listener 关闭时会触发此函数。
+// 确保每个子 listener 只会触发一次
+func (pl *Listener) close(sub *chanListener) {
+	pl.mutex.Lock()
+	delete(pl.subs, sub)
+	zero := len(pl.subs) == 0
+	pl.mutex.Unlock()
+
+	if zero { // 所有的子 listener 关闭后，主 listener 就应该被关闭。
+		_ = pl.raw.Close()
+	}
+}
+
 type chanListener struct {
+	master *Listener
 	conn   chan net.Conn
 	addr   net.Addr
 	stop   chan struct{}
@@ -132,6 +164,7 @@ func (cl *chanListener) Accept() (net.Conn, error) {
 func (cl *chanListener) Close() error {
 	if cl.closed.CompareAndSwap(false, true) {
 		close(cl.stop)
+		cl.master.close(cl)
 		return nil
 	}
 

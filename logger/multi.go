@@ -10,8 +10,8 @@ import (
 
 type Handler interface {
 	slog.Handler
-	Attach(hs ...slog.Handler)
-	Detach(hs ...slog.Handler)
+	Append(hs ...slog.Handler)
+	Remove(hs ...slog.Handler)
 	Replace(hs ...slog.Handler)
 }
 
@@ -44,7 +44,7 @@ func (h *multiHandler) WithGroup(name string) slog.Handler {
 	return h.load().WithGroup(name)
 }
 
-func (h *multiHandler) Attach(hs ...slog.Handler) {
+func (h *multiHandler) Append(hs ...slog.Handler) {
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
 
@@ -60,7 +60,7 @@ func (h *multiHandler) Attach(hs ...slog.Handler) {
 	h.replace(h.out)
 }
 
-func (h *multiHandler) Detach(hs ...slog.Handler) {
+func (h *multiHandler) Remove(hs ...slog.Handler) {
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
 

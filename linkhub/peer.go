@@ -2,14 +2,14 @@ package linkhub
 
 import "github.com/xtaci/smux"
 
-type Handler interface {
-	Handle(*smux.Session)
+type Server interface {
+	Serve(*smux.Session)
 }
 
 type Info struct {
-	ID   int64
-	Inet string
-	Host string
+	ID   int64  `json:"id"`
+	Inet string `json:"inet"`
+	Host string `json:"host"`
 }
 
 type Peer interface {
