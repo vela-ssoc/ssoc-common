@@ -2,12 +2,12 @@ package linkhub
 
 import "context"
 
-func WithContext(parent context.Context, v any) context.Context {
+func WithContext(parent context.Context, p Peer) context.Context {
 	if parent == nil {
 		parent = context.Background()
 	}
 
-	return context.WithValue(parent, httpContextKey, v)
+	return context.WithValue(parent, httpContextKey, p)
 }
 
 func FromContext(ctx context.Context) Peer {

@@ -1,6 +1,6 @@
 module github.com/vela-ssoc/ssoc-common
 
-go 1.25.3
+go 1.25.5
 
 require (
 	github.com/go-playground/locales v0.14.1
