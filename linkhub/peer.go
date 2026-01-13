@@ -2,8 +2,8 @@ package linkhub
 
 import "github.com/xtaci/smux"
 
-type Server interface {
-	Serve(*smux.Session)
+type MUXServer interface {
+	ServeMUX(*smux.Session)
 }
 
 type Info struct {
