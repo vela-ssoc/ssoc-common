@@ -106,9 +106,9 @@ func (pl *Listener) Accept() error {
 }
 
 func (pl *Listener) enqueue(conn net.Conn) {
-	if du := pl.timeout; du > 0 {
-		now := time.Now()
-		_ = conn.SetReadDeadline(now.Add(du))
+	timeout := pl.timeout
+	if timeout > 0 {
+		_ = conn.SetReadDeadline(time.Now().Add(timeout))
 	}
 	buf := bufio.NewReader(conn)
 	peek, err := buf.Peek(1)
@@ -116,12 +116,15 @@ func (pl *Listener) enqueue(conn net.Conn) {
 		_ = conn.Close()
 		return
 	}
+	if timeout > 0 {
+		_ = conn.SetReadDeadline(time.Time{})
+	}
 
 	pc := &peekConn{conn: conn, read: io.MultiReader(buf, conn)}
 	if peek[0] == 0x16 { // TLS 首字符特征
-		err = pl.tls.enqueue(pc, pl.timeout)
+		err = pl.tls.enqueue(pc, timeout)
 	} else {
-		err = pl.tcp.enqueue(pc, pl.timeout)
+		err = pl.tcp.enqueue(pc, timeout)
 	}
 	if err != nil {
 		_ = conn.Close()
