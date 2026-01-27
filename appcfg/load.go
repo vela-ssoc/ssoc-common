@@ -1,4 +1,4 @@
-package profile
+package appcfg
 
 import (
 	"context"
@@ -9,11 +9,14 @@ import (
 	"strings"
 )
 
+// Reader 配置加载器。
 type Reader[T any] interface {
+
+	// Read 加载配置文件。
 	Read(ctx context.Context) (*T, error)
 }
 
-func JSONFile[T any](file string, limit ...int64) Reader[T] {
+func NewJSON[T any](file string, limit ...int64) Reader[T] {
 	var lim int64
 	if len(limit) > 0 {
 		lim = limit[0]
