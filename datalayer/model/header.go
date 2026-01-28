@@ -18,7 +18,7 @@ func (h MapHeader) Canonical() MapHeader {
 	return ret
 }
 
-func (h MapHeader) Values() []string {
+func (h MapHeader) Pairs() []string {
 	res := make([]string, 0, len(h))
 	for k, v := range h {
 		res = append(res, k+": "+v)
