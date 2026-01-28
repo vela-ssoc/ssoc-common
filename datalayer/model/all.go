@@ -65,6 +65,7 @@ func All() []any {
 		Third{},
 		ThirdCustomized{},
 		User{},
+		VictoriaMetrics{},
 		VIP{},
 	}
 }

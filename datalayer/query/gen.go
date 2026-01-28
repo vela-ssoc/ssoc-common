@@ -81,6 +81,7 @@ var (
 	ThirdCustomized        *thirdCustomized
 	User                   *user
 	VIP                    *vIP
+	VictoriaMetrics        *victoriaMetrics
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
@@ -149,6 +150,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	ThirdCustomized = &Q.ThirdCustomized
 	User = &Q.User
 	VIP = &Q.VIP
+	VictoriaMetrics = &Q.VictoriaMetrics
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
@@ -218,6 +220,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		ThirdCustomized:        newThirdCustomized(db, opts...),
 		User:                   newUser(db, opts...),
 		VIP:                    newVIP(db, opts...),
+		VictoriaMetrics:        newVictoriaMetrics(db, opts...),
 	}
 }
 
@@ -288,6 +291,7 @@ type Query struct {
 	ThirdCustomized        thirdCustomized
 	User                   user
 	VIP                    vIP
+	VictoriaMetrics        victoriaMetrics
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -359,6 +363,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		ThirdCustomized:        q.ThirdCustomized.clone(db),
 		User:                   q.User.clone(db),
 		VIP:                    q.VIP.clone(db),
+		VictoriaMetrics:        q.VictoriaMetrics.clone(db),
 	}
 }
 
@@ -437,6 +442,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		ThirdCustomized:        q.ThirdCustomized.replaceDB(db),
 		User:                   q.User.replaceDB(db),
 		VIP:                    q.VIP.replaceDB(db),
+		VictoriaMetrics:        q.VictoriaMetrics.replaceDB(db),
 	}
 }
 
@@ -505,6 +511,7 @@ type queryCtx struct {
 	ThirdCustomized        IThirdCustomizedDo
 	User                   IUserDo
 	VIP                    IVIPDo
+	VictoriaMetrics        IVictoriaMetricsDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
@@ -573,6 +580,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		ThirdCustomized:        q.ThirdCustomized.WithContext(ctx),
 		User:                   q.User.WithContext(ctx),
 		VIP:                    q.VIP.WithContext(ctx),
+		VictoriaMetrics:        q.VictoriaMetrics.WithContext(ctx),
 	}
 }
 
