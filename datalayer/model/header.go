@@ -17,3 +17,12 @@ func (h MapHeader) Canonical() MapHeader {
 
 	return ret
 }
+
+func (h MapHeader) Values() []string {
+	res := make([]string, 0, len(h))
+	for k, v := range h {
+		res = append(res, k+": "+v)
+	}
+
+	return res
+}

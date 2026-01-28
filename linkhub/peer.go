@@ -2,10 +2,6 @@ package linkhub
 
 import "github.com/xtaci/smux"
 
-type MUXServer interface {
-	ServeMUX(*smux.Session)
-}
-
 type Info struct {
 	ID   int64  `json:"id"`
 	Inet string `json:"inet"`
