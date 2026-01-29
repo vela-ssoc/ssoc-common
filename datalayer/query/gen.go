@@ -58,6 +58,7 @@ var (
 	PassDNS                *passDNS
 	PassIP                 *passIP
 	Purl                   *purl
+	Pyroscope              *pyroscope
 	Risk                   *risk
 	RiskDNS                *riskDNS
 	RiskFile               *riskFile
@@ -127,6 +128,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	PassDNS = &Q.PassDNS
 	PassIP = &Q.PassIP
 	Purl = &Q.Purl
+	Pyroscope = &Q.Pyroscope
 	Risk = &Q.Risk
 	RiskDNS = &Q.RiskDNS
 	RiskFile = &Q.RiskFile
@@ -197,6 +199,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		PassDNS:                newPassDNS(db, opts...),
 		PassIP:                 newPassIP(db, opts...),
 		Purl:                   newPurl(db, opts...),
+		Pyroscope:              newPyroscope(db, opts...),
 		Risk:                   newRisk(db, opts...),
 		RiskDNS:                newRiskDNS(db, opts...),
 		RiskFile:               newRiskFile(db, opts...),
@@ -268,6 +271,7 @@ type Query struct {
 	PassDNS                passDNS
 	PassIP                 passIP
 	Purl                   purl
+	Pyroscope              pyroscope
 	Risk                   risk
 	RiskDNS                riskDNS
 	RiskFile               riskFile
@@ -340,6 +344,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		PassDNS:                q.PassDNS.clone(db),
 		PassIP:                 q.PassIP.clone(db),
 		Purl:                   q.Purl.clone(db),
+		Pyroscope:              q.Pyroscope.clone(db),
 		Risk:                   q.Risk.clone(db),
 		RiskDNS:                q.RiskDNS.clone(db),
 		RiskFile:               q.RiskFile.clone(db),
@@ -419,6 +424,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		PassDNS:                q.PassDNS.replaceDB(db),
 		PassIP:                 q.PassIP.replaceDB(db),
 		Purl:                   q.Purl.replaceDB(db),
+		Pyroscope:              q.Pyroscope.replaceDB(db),
 		Risk:                   q.Risk.replaceDB(db),
 		RiskDNS:                q.RiskDNS.replaceDB(db),
 		RiskFile:               q.RiskFile.replaceDB(db),
@@ -488,6 +494,7 @@ type queryCtx struct {
 	PassDNS                IPassDNSDo
 	PassIP                 IPassIPDo
 	Purl                   IPurlDo
+	Pyroscope              IPyroscopeDo
 	Risk                   IRiskDo
 	RiskDNS                IRiskDNSDo
 	RiskFile               IRiskFileDo
@@ -557,6 +564,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		PassDNS:                q.PassDNS.WithContext(ctx),
 		PassIP:                 q.PassIP.WithContext(ctx),
 		Purl:                   q.Purl.WithContext(ctx),
+		Pyroscope:              q.Pyroscope.WithContext(ctx),
 		Risk:                   q.Risk.WithContext(ctx),
 		RiskDNS:                q.RiskDNS.WithContext(ctx),
 		RiskFile:               q.RiskFile.WithContext(ctx),

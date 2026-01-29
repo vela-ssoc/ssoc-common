@@ -32,6 +32,8 @@ func newVictoriaMetrics(db *gorm.DB, opts ...gen.DOOption) victoriaMetrics {
 	_victoriaMetrics.Enabled = field.NewBool(tableName, "enabled")
 	_victoriaMetrics.URL = field.NewString(tableName, "url")
 	_victoriaMetrics.Method = field.NewString(tableName, "method")
+	_victoriaMetrics.Username = field.NewString(tableName, "username")
+	_victoriaMetrics.Password = field.NewString(tableName, "password")
 	_victoriaMetrics.Header = field.NewField(tableName, "header")
 	_victoriaMetrics.CreatedAt = field.NewTime(tableName, "created_at")
 	_victoriaMetrics.UpdatedAt = field.NewTime(tableName, "updated_at")
@@ -49,6 +51,8 @@ type victoriaMetrics struct {
 	Enabled   field.Bool   // 是否启用
 	URL       field.String // 推送地址
 	Method    field.String // 请求方法
+	Username  field.String // 认证用户
+	Password  field.String // 认证密码
 	Header    field.Field  // Header
 	CreatedAt field.Time   // 创建时间
 	UpdatedAt field.Time   // 更新时间
@@ -72,6 +76,8 @@ func (v *victoriaMetrics) updateTableName(table string) *victoriaMetrics {
 	v.Enabled = field.NewBool(table, "enabled")
 	v.URL = field.NewString(table, "url")
 	v.Method = field.NewString(table, "method")
+	v.Username = field.NewString(table, "username")
+	v.Password = field.NewString(table, "password")
 	v.Header = field.NewField(table, "header")
 	v.CreatedAt = field.NewTime(table, "created_at")
 	v.UpdatedAt = field.NewTime(table, "updated_at")
@@ -103,11 +109,13 @@ func (v *victoriaMetrics) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (v *victoriaMetrics) fillFieldMap() {
-	v.fieldMap = make(map[string]field.Expr, 7)
+	v.fieldMap = make(map[string]field.Expr, 9)
 	v.fieldMap["id"] = v.ID
 	v.fieldMap["enabled"] = v.Enabled
 	v.fieldMap["url"] = v.URL
 	v.fieldMap["method"] = v.Method
+	v.fieldMap["username"] = v.Username
+	v.fieldMap["password"] = v.Password
 	v.fieldMap["header"] = v.Header
 	v.fieldMap["created_at"] = v.CreatedAt
 	v.fieldMap["updated_at"] = v.UpdatedAt

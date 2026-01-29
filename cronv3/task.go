@@ -62,6 +62,7 @@ func (s *scheduledTask) Call(ctx context.Context) error {
 		s.log.Debug("定时任务执行完毕", attrs...)
 		return nil
 	}
+	attrs = append(attrs, "error", err)
 	if panicked {
 		s.log.Error("定时任务执行发生 panic", attrs...)
 	} else {

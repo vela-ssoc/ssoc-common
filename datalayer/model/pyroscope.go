@@ -2,11 +2,10 @@ package model
 
 import "time"
 
-type VictoriaMetrics struct {
+type Pyroscope struct {
 	ID        int64     `json:"id,string"  gorm:"column:id;primaryKey;autoIncrement;comment:ID"`
 	Enabled   bool      `json:"enabled"    gorm:"column:enabled;comment:是否启用"`
 	URL       string    `json:"url"        gorm:"column:url;size:255;comment:推送地址"`
-	Method    string    `json:"method"     gorm:"column:method;size:10;comment:请求方法"`
 	Username  string    `json:"username"   gorm:"column:username;size:50;comment:认证用户"`
 	Password  string    `json:"password"   gorm:"column:password;size:255;comment:认证密码"`
 	Header    MapHeader `json:"header"     gorm:"column:header;type:json;serializer:json;comment:Header"`
@@ -14,6 +13,6 @@ type VictoriaMetrics struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"column:updated_at;notnull;autoUpdateTime(3);comment:更新时间"`
 }
 
-func (VictoriaMetrics) TableName() string {
-	return "victoria_metrics"
+func (Pyroscope) TableName() string {
+	return "pyroscope"
 }

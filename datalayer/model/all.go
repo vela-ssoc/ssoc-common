@@ -43,6 +43,7 @@ func All() []any {
 		PassDNS{},
 		PassIP{},
 		Purl{},
+		Pyroscope{},
 		Risk{},
 		RiskDNS{},
 		RiskFile{},
