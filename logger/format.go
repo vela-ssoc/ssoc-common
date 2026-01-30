@@ -12,7 +12,7 @@ type Format struct {
 
 // NewFormat format 式的日志输出。
 // ship: 6
-// pyroscope: 5
+// pyroscope: 5-6
 func NewFormat(h slog.Handler, skip int) *Format {
 	sh := Skip(h, skip)
 

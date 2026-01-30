@@ -21,12 +21,19 @@ func ANSI(w io.Writer) (int, error) {
 		username, workdir, compileAt, commitAt, buildPath, revision)
 }
 
+// Version 获取自身的版本号。
+func Version() string {
+	parseOnce()
+
+	return version
+}
+
 const ansiLogo = "\033[1;33m" +
 	"   ______________  _____  \n" +
 	"  / ___/ ___/ __ \\/ ___/ \n" +
 	" (__  |__  ) /_/ / /__    \n" +
 	"/____/____/\\____/\\___/  \033[0m\n" +
-	"\033[0;35m:: %s ::\033[0m  \033[3;95m%s\033[0m\n\n" +
+	"\033[0;35m:: %s ::\033[0m  \033[3;95mv%s\033[0m\n\n" +
 	"\t\033[1;36m进程 PID:\033[0m %d\n" +
 	"\t\033[1;36m操作系统:\033[0m %s\n" +
 	"\t\033[1;36m系统架构:\033[0m %s\n" +
@@ -38,8 +45,8 @@ const ansiLogo = "\033[1;33m" +
 	"\t\033[1;36m修订版本:\033[0m https://%s/tree/%s\n\n"
 
 var (
-	version     string // 允许 -X 编译时注入
 	compileTime string // 允许 -X 编译时注入
+	version     string
 	pid         int
 	goos        string
 	arch        string
@@ -77,9 +84,7 @@ func parse() {
 			revision = val
 		case "vcs.time":
 			commitAt = parseTime(val)
-			if version == "" {
-				version = commitAt.UTC().Format("v06.1.2-150405")
-			}
+			version = commitAt.UTC().Format("06.1.2-t150405")
 		}
 	}
 }
