@@ -47,7 +47,7 @@ func (m *mapHub) Put(id int64, mux muxconn.Muxer, inf PeerInfo) Peer {
 	}
 	m.peers[host] = peer
 
-	return nil
+	return peer
 }
 
 func (m *mapHub) Get(host string) Peer {
