@@ -2,7 +2,6 @@ package logger
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"sync"
 	"sync/atomic"
@@ -10,9 +9,9 @@ import (
 
 type Handler interface {
 	slog.Handler
-	Append(hs ...slog.Handler)
-	Remove(hs ...slog.Handler)
-	Replace(hs ...slog.Handler)
+	Append(...slog.Handler)
+	Remove(...slog.Handler)
+	Replace(...slog.Handler)
 }
 
 func NewMultiHandler(hs ...slog.Handler) Handler {
@@ -25,7 +24,7 @@ func NewMultiHandler(hs ...slog.Handler) Handler {
 type multiHandler struct {
 	mtx sync.Mutex
 	out map[slog.Handler]struct{}
-	ptr atomic.Pointer[slogMultiHandler]
+	ptr atomic.Pointer[slog.MultiHandler]
 }
 
 func (h *multiHandler) Enabled(ctx context.Context, level slog.Level) bool {
@@ -89,15 +88,15 @@ func (h *multiHandler) Replace(hs ...slog.Handler) {
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
 	h.out = out
-	mh := newMultiHandler(hs...)
+	mh := slog.NewMultiHandler(hs...)
 	h.ptr.Store(mh)
 }
 
-func (h *multiHandler) load() *slogMultiHandler {
+func (h *multiHandler) load() *slog.MultiHandler {
 	if mh := h.ptr.Load(); mh != nil {
 		return mh
 	}
-	return newMultiHandler()
+	return slog.NewMultiHandler()
 }
 
 func (h *multiHandler) replace(out map[slog.Handler]struct{}) {
@@ -107,57 +106,6 @@ func (h *multiHandler) replace(out map[slog.Handler]struct{}) {
 	}
 
 	h.out = out
-	mh := newMultiHandler(hs...)
+	mh := slog.NewMultiHandler(hs...)
 	h.ptr.Store(mh)
-}
-
-// slogMultiHandler is a [slog.Handler] that invokes all the given Handlers.
-// Its Enable method reports whether any of the handlers' Enabled methods return true.
-// Its Handle, WithAttr and WithGroup methods call the corresponding method on each of the enabled handlers.
-type slogMultiHandler struct {
-	multi []slog.Handler
-}
-
-func (h *slogMultiHandler) Enabled(ctx context.Context, l slog.Level) bool {
-	for i := range h.multi {
-		if h.multi[i].Enabled(ctx, l) {
-			return true
-		}
-	}
-	return false
-}
-
-func (h *slogMultiHandler) Handle(ctx context.Context, r slog.Record) error {
-	var errs []error
-	for i := range h.multi {
-		if h.multi[i].Enabled(ctx, r.Level) {
-			if err := h.multi[i].Handle(ctx, r.Clone()); err != nil {
-				errs = append(errs, err)
-			}
-		}
-	}
-	return errors.Join(errs...)
-}
-
-func (h *slogMultiHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	handlers := make([]slog.Handler, 0, len(h.multi))
-	for i := range h.multi {
-		handlers = append(handlers, h.multi[i].WithAttrs(attrs))
-	}
-	return &slogMultiHandler{multi: handlers}
-}
-
-func (h *slogMultiHandler) WithGroup(name string) slog.Handler {
-	handlers := make([]slog.Handler, 0, len(h.multi))
-	for i := range h.multi {
-		handlers = append(handlers, h.multi[i].WithGroup(name))
-	}
-	return &slogMultiHandler{multi: handlers}
-}
-
-// newMultiHandler creates a [slogMultiHandler] with the given Handlers.
-func newMultiHandler(handlers ...slog.Handler) *slogMultiHandler {
-	h := make([]slog.Handler, len(handlers))
-	copy(h, handlers)
-	return &slogMultiHandler{multi: h}
 }
