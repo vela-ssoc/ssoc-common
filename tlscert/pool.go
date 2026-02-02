@@ -18,7 +18,11 @@ import (
 	"time"
 )
 
-type LoadFunc func(context.Context) ([]*tls.Certificate, error)
+// CertificateLoader 证书加载器。
+type CertificateLoader interface {
+	// LoadCertificate 加载证书。
+	LoadCertificate(ctx context.Context) ([]*tls.Certificate, error)
+}
 
 type Matcher interface {
 	GetCertificate(ch *tls.ClientHelloInfo) (*tls.Certificate, error)
@@ -32,7 +36,7 @@ type Matcher interface {
 	Reset()
 }
 
-func NewMatch(load LoadFunc, log *slog.Logger) Matcher {
+func NewMatch(load CertificateLoader, log *slog.Logger) Matcher {
 	return &certificateMatcher{
 		load: load,
 		log:  log,
@@ -40,7 +44,7 @@ func NewMatch(load LoadFunc, log *slog.Logger) Matcher {
 }
 
 type certificateMatcher struct {
-	load        LoadFunc
+	load        CertificateLoader
 	log         *slog.Logger
 	mutex       sync.Mutex
 	disableSelf bool                            // 是否禁用自签名证书
@@ -124,7 +128,7 @@ func (m *certificateMatcher) slowLoadPool(parent context.Context) *certificatePo
 	ctx, cancel := context.WithTimeout(parent, time.Minute)
 	defer cancel()
 
-	pairs, err := m.load(ctx)
+	pairs, err := m.load.LoadCertificate(ctx)
 	if err != nil {
 		pool.err = err
 		// 可能是网络波动导致的超时问题，不放入结果缓存。

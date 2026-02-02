@@ -16,7 +16,7 @@ func NewFile(certFile, keyFile string) File {
 	}
 }
 
-func (f File) Load(context.Context) ([]*tls.Certificate, error) {
+func (f File) LoadCertificate(context.Context) ([]*tls.Certificate, error) {
 	crt, err := tls.LoadX509KeyPair(f.certFile, f.keyFile)
 	if err != nil {
 		return nil, err
