@@ -57,3 +57,25 @@ func (u User) IsLocal() bool {
 func (u User) IsOA() bool {
 	return u.Domain == UdOA
 }
+
+type Account struct {
+	ID        int64
+	Username  string
+	Nickname  string
+	Enabled   bool
+	localized bool
+	Passwd    *AccountPasswd `json:"passwd"`
+	TOTP      *AccountTOTP   `json:"totp"`
+}
+
+type AccountTOTP struct {
+	Secret    string    `json:"-"`                   // OTP 密钥
+	Used      bool      `json:"used"`                // 是否扫码绑定使用
+	UsedAt    time.Time `json:"used_at,omitzero"`    // 绑定使用时间
+	CreatedAt time.Time `json:"created_at,omitzero"` // 本密钥生成时间
+}
+
+type AccountPasswd struct {
+	Secret    string    `json:"-"`                   // 密码
+	UpdatedAt time.Time `json:"updated_at,omitzero"` // 密码修改时间
+}

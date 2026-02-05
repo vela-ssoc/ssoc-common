@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/vela-ssoc/ssoc-common/data/problem"
 	"github.com/vela-ssoc/ssoc-common/validation"
+	"github.com/vela-ssoc/ssoc-proto/muxtool"
 	"github.com/xgfone/ship/v5"
 	"gorm.io/gorm"
 )
@@ -21,7 +21,7 @@ func NotFound(_ *ship.Context) error {
 }
 
 func HandleError(c *ship.Context, e error) {
-	pd := &problem.Details{
+	pd := &muxtool.ProblemDetails{
 		Type:     c.Host(),
 		Title:    "请求错误",
 		Status:   http.StatusBadRequest,

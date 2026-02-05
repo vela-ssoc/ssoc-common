@@ -41,6 +41,7 @@ var (
 	KVAudit                *kVAudit
 	KVData                 *kVData
 	LoginLock              *loginLock
+	MFALoginChallenge      *mFALoginChallenge
 	Minion                 *minion
 	MinionAccount          *minionAccount
 	MinionBin              *minionBin
@@ -57,7 +58,6 @@ var (
 	Oplog                  *oplog
 	PassDNS                *passDNS
 	PassIP                 *passIP
-	Purl                   *purl
 	Pyroscope              *pyroscope
 	Risk                   *risk
 	RiskDNS                *riskDNS
@@ -111,6 +111,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	KVAudit = &Q.KVAudit
 	KVData = &Q.KVData
 	LoginLock = &Q.LoginLock
+	MFALoginChallenge = &Q.MFALoginChallenge
 	Minion = &Q.Minion
 	MinionAccount = &Q.MinionAccount
 	MinionBin = &Q.MinionBin
@@ -127,7 +128,6 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	Oplog = &Q.Oplog
 	PassDNS = &Q.PassDNS
 	PassIP = &Q.PassIP
-	Purl = &Q.Purl
 	Pyroscope = &Q.Pyroscope
 	Risk = &Q.Risk
 	RiskDNS = &Q.RiskDNS
@@ -182,6 +182,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		KVAudit:                newKVAudit(db, opts...),
 		KVData:                 newKVData(db, opts...),
 		LoginLock:              newLoginLock(db, opts...),
+		MFALoginChallenge:      newMFALoginChallenge(db, opts...),
 		Minion:                 newMinion(db, opts...),
 		MinionAccount:          newMinionAccount(db, opts...),
 		MinionBin:              newMinionBin(db, opts...),
@@ -198,7 +199,6 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Oplog:                  newOplog(db, opts...),
 		PassDNS:                newPassDNS(db, opts...),
 		PassIP:                 newPassIP(db, opts...),
-		Purl:                   newPurl(db, opts...),
 		Pyroscope:              newPyroscope(db, opts...),
 		Risk:                   newRisk(db, opts...),
 		RiskDNS:                newRiskDNS(db, opts...),
@@ -254,6 +254,7 @@ type Query struct {
 	KVAudit                kVAudit
 	KVData                 kVData
 	LoginLock              loginLock
+	MFALoginChallenge      mFALoginChallenge
 	Minion                 minion
 	MinionAccount          minionAccount
 	MinionBin              minionBin
@@ -270,7 +271,6 @@ type Query struct {
 	Oplog                  oplog
 	PassDNS                passDNS
 	PassIP                 passIP
-	Purl                   purl
 	Pyroscope              pyroscope
 	Risk                   risk
 	RiskDNS                riskDNS
@@ -327,6 +327,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		KVAudit:                q.KVAudit.clone(db),
 		KVData:                 q.KVData.clone(db),
 		LoginLock:              q.LoginLock.clone(db),
+		MFALoginChallenge:      q.MFALoginChallenge.clone(db),
 		Minion:                 q.Minion.clone(db),
 		MinionAccount:          q.MinionAccount.clone(db),
 		MinionBin:              q.MinionBin.clone(db),
@@ -343,7 +344,6 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Oplog:                  q.Oplog.clone(db),
 		PassDNS:                q.PassDNS.clone(db),
 		PassIP:                 q.PassIP.clone(db),
-		Purl:                   q.Purl.clone(db),
 		Pyroscope:              q.Pyroscope.clone(db),
 		Risk:                   q.Risk.clone(db),
 		RiskDNS:                q.RiskDNS.clone(db),
@@ -407,6 +407,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		KVAudit:                q.KVAudit.replaceDB(db),
 		KVData:                 q.KVData.replaceDB(db),
 		LoginLock:              q.LoginLock.replaceDB(db),
+		MFALoginChallenge:      q.MFALoginChallenge.replaceDB(db),
 		Minion:                 q.Minion.replaceDB(db),
 		MinionAccount:          q.MinionAccount.replaceDB(db),
 		MinionBin:              q.MinionBin.replaceDB(db),
@@ -423,7 +424,6 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Oplog:                  q.Oplog.replaceDB(db),
 		PassDNS:                q.PassDNS.replaceDB(db),
 		PassIP:                 q.PassIP.replaceDB(db),
-		Purl:                   q.Purl.replaceDB(db),
 		Pyroscope:              q.Pyroscope.replaceDB(db),
 		Risk:                   q.Risk.replaceDB(db),
 		RiskDNS:                q.RiskDNS.replaceDB(db),
@@ -477,6 +477,7 @@ type queryCtx struct {
 	KVAudit                IKVAuditDo
 	KVData                 IKVDataDo
 	LoginLock              ILoginLockDo
+	MFALoginChallenge      IMFALoginChallengeDo
 	Minion                 IMinionDo
 	MinionAccount          IMinionAccountDo
 	MinionBin              IMinionBinDo
@@ -493,7 +494,6 @@ type queryCtx struct {
 	Oplog                  IOplogDo
 	PassDNS                IPassDNSDo
 	PassIP                 IPassIPDo
-	Purl                   IPurlDo
 	Pyroscope              IPyroscopeDo
 	Risk                   IRiskDo
 	RiskDNS                IRiskDNSDo
@@ -547,6 +547,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		KVAudit:                q.KVAudit.WithContext(ctx),
 		KVData:                 q.KVData.WithContext(ctx),
 		LoginLock:              q.LoginLock.WithContext(ctx),
+		MFALoginChallenge:      q.MFALoginChallenge.WithContext(ctx),
 		Minion:                 q.Minion.WithContext(ctx),
 		MinionAccount:          q.MinionAccount.WithContext(ctx),
 		MinionBin:              q.MinionBin.WithContext(ctx),
@@ -563,7 +564,6 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Oplog:                  q.Oplog.WithContext(ctx),
 		PassDNS:                q.PassDNS.WithContext(ctx),
 		PassIP:                 q.PassIP.WithContext(ctx),
-		Purl:                   q.Purl.WithContext(ctx),
 		Pyroscope:              q.Pyroscope.WithContext(ctx),
 		Risk:                   q.Risk.WithContext(ctx),
 		RiskDNS:                q.RiskDNS.WithContext(ctx),
