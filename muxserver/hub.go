@@ -5,14 +5,15 @@ import (
 
 	"github.com/vela-ssoc/ssoc-proto/muxconn"
 	"github.com/vela-ssoc/ssoc-proto/muxproto"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type Huber interface {
-	Put(id int64, mux muxconn.Muxer, inf PeerInfo) Peer
+	Put(id bson.ObjectID, mux muxconn.Muxer, inf PeerInfo) Peer
 	Get(host string) Peer
 	Del(host string) Peer
-	GetID(id int64) Peer
-	DelID(id int64) Peer
+	GetID(id bson.ObjectID) Peer
+	DelID(id bson.ObjectID) Peer
 	Peers() []Peer
 	Domain() string
 }
@@ -30,8 +31,8 @@ type mapHub struct {
 	peers  map[string]Peer
 }
 
-func (m *mapHub) Put(id int64, mux muxconn.Muxer, inf PeerInfo) Peer {
-	host := muxproto.ResolveHostname(id, m.domain)
+func (m *mapHub) Put(id bson.ObjectID, mux muxconn.Muxer, inf PeerInfo) Peer {
+	host := m.resolveHostname(id)
 	peer := &muxPeer{
 		id:   id,
 		mux:  mux,
@@ -69,13 +70,13 @@ func (m *mapHub) Del(host string) Peer {
 	return peer
 }
 
-func (m *mapHub) GetID(id int64) Peer {
-	host := muxproto.ResolveHostname(id, m.domain)
+func (m *mapHub) GetID(id bson.ObjectID) Peer {
+	host := m.resolveHostname(id)
 	return m.Get(host)
 }
 
-func (m *mapHub) DelID(id int64) Peer {
-	host := muxproto.ResolveHostname(id, m.domain)
+func (m *mapHub) DelID(id bson.ObjectID) Peer {
+	host := m.resolveHostname(id)
 	return m.Del(host)
 }
 
@@ -93,4 +94,8 @@ func (m *mapHub) Peers() []Peer {
 
 func (m *mapHub) Domain() string {
 	return m.domain
+}
+
+func (m *mapHub) resolveHostname(id bson.ObjectID) string {
+	return muxproto.ResolveHostname(id.Hex(), m.domain)
 }

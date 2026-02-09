@@ -1,0 +1,73 @@
+package model
+
+import (
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/hex"
+	"hash"
+)
+
+type Checksum struct {
+	MD5    string `bson:"md5"    json:"md5"`
+	SHA1   string `bson:"sha1"   json:"sha1"`
+	SHA256 string `bson:"sha256" json:"sha256"`
+	SHA512 string `bson:"sha512" json:"sha512"`
+}
+
+func (chk Checksum) IsZero() bool {
+	return chk.MD5 == "" &&
+		chk.SHA1 == "" &&
+		chk.SHA256 == "" &&
+		chk.SHA512 == ""
+}
+
+func (chk Checksum) Map() map[string]string {
+	return map[string]string{
+		"md5":    chk.MD5,
+		"sha1":   chk.SHA1,
+		"sha256": chk.SHA256,
+		"sha512": chk.SHA512,
+	}
+}
+
+func NewHashWriter() *HashWriter {
+	return &HashWriter{
+		md5:    md5.New(),
+		sha1:   sha1.New(),
+		sha256: sha256.New(),
+		sha512: sha512.New(),
+	}
+}
+
+type HashWriter struct {
+	md5    hash.Hash
+	sha1   hash.Hash
+	sha256 hash.Hash
+	sha512 hash.Hash
+}
+
+func (hw *HashWriter) Write(p []byte) (int, error) {
+	n := len(p)
+	_, _ = hw.md5.Write(p)
+	_, _ = hw.sha1.Write(p)
+	_, _ = hw.sha256.Write(p)
+	_, _ = hw.sha512.Write(p)
+
+	return n, nil
+}
+
+func (hw *HashWriter) Sum() Checksum {
+	md5s := hw.md5.Sum(nil)
+	sha1s := hw.sha1.Sum(nil)
+	sha256s := hw.sha256.Sum(nil)
+	sha512s := hw.sha512.Sum(nil)
+
+	return Checksum{
+		MD5:    hex.EncodeToString(md5s),
+		SHA1:   hex.EncodeToString(sha1s),
+		SHA256: hex.EncodeToString(sha256s),
+		SHA512: hex.EncodeToString(sha512s),
+	}
+}
