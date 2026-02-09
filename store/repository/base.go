@@ -224,8 +224,8 @@ func (r *baseRepository[T]) Page(ctx context.Context, filter any, page, size int
 		return EmptyPages[T](size), nil
 	}
 
-	lastPage, skip, limit := r.paginate(page, size, count)
-	opt := options.Find().SetSkip(skip).SetLimit(limit)
+	lastPage, skip := r.paginate(page, size, count)
+	opt := options.Find().SetSkip(skip).SetLimit(size)
 	opts = append(opts, opt)
 	cur, err := r.coll.Find(ctx, filter, opts...)
 	if err != nil {
@@ -304,13 +304,13 @@ func (*baseRepository[T]) cursorTo(ctx context.Context, cur *mongo.Cursor, resul
 }
 
 // paginate 分页计算，如果页码过大导致超出页数，则会保留最后一页的内容，并返回修正后的最后页码。
-func (r *baseRepository[T]) paginate(page, size, count int64) (fixedPage, skip, limit int64) {
+func (r *baseRepository[T]) paginate(page, size, count int64) (fixedPage, skip int64) {
 	if maximum := (count + size - 1) / size; maximum > 0 && maximum < page {
 		page = maximum
 	}
 	skip = (page - 1) * size
 
-	return page, size, skip
+	return page, skip
 }
 
 // clampPageSize 对输入的 page size 参数做区间限制处理。

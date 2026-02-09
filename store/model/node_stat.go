@@ -9,8 +9,8 @@ type TunnelStat struct {
 	Library        TunnelLibrary `bson:"library,omitempty"         json:"library,omitzero"`
 	LocalAddr      string        `bson:"local_addr,omitempty"      json:"local_addr,omitzero"`
 	RemoteAddr     string        `bson:"remote_addr,omitempty"     json:"remote_addr,omitzero"`
-	ReceiveBytes   uint64        `bson:"receive_bytes"             json:"receive_bytes,omitzero"`
-	TransmitBytes  uint64        `bson:"transmit_bytes"            json:"transmit_bytes,omitzero"`
+	ReceiveBytes   uint64        `bson:"receive_bytes"             json:"receive_bytes"`
+	TransmitBytes  uint64        `bson:"transmit_bytes"            json:"transmit_bytes"`
 }
 
 type TunnelLibrary struct {
