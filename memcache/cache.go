@@ -3,57 +3,54 @@ package memcache
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 )
 
-type Cache[V, E any] interface {
-	Load(context.Context) (V, E)
-	Forget() (V, E)
+type Cache[T any] struct {
+	fun func(context.Context) (T, error)
+	mtx sync.Mutex
+	ptr atomic.Pointer[resultEntry[T]]
 }
 
-func NewCache[V, E any](fn func(context.Context) (V, E)) Cache[V, E] {
-	return &cache[V, E]{
-		fn: fn,
+func NewCache[T any](fun func(context.Context) (T, error)) *Cache[T] {
+	return &Cache[T]{
+		fun: fun,
 	}
 }
 
-type cache[V, E any] struct {
-	fn  func(context.Context) (V, E)
-	mu  sync.RWMutex
-	ent *entry2[V, E]
-}
-
-func (ch *cache[V, E]) Load(ctx context.Context) (V, E) {
-	ch.mu.RLock()
-	ent := ch.ent
-	ch.mu.RUnlock()
-	if ent != nil {
-		return ent.load()
+func (c *Cache[T]) Load(ctx context.Context) (T, error) {
+	if r := c.ptr.Load(); r != nil {
+		return r.t, r.e
 	}
 
-	return ch.slowLoad(ctx)
+	return c.slowLoad(ctx)
 }
 
-func (ch *cache[V, E]) Forget() (v V, e E) {
-	ch.mu.Lock()
-	if ent := ch.ent; ent != nil {
-		v, e = ent.load()
-		ch.ent = nil
+func (c *Cache[T]) Forget() (T, error) {
+	if r := c.ptr.Swap(nil); r != nil {
+		return r.t, r.e
 	}
-	ch.mu.Unlock()
 
-	return
+	var t T
+
+	return t, nil
 }
 
-func (ch *cache[V, E]) slowLoad(ctx context.Context) (V, E) {
-	ch.mu.Lock()
-	defer ch.mu.Unlock()
+func (c *Cache[T]) slowLoad(ctx context.Context) (T, error) {
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 
-	if ent := ch.ent; ent != nil {
-		return ent.load()
+	if d := c.ptr.Load(); d != nil {
+		return d.t, d.e
 	}
 
-	v, e := ch.fn(ctx)
-	ch.ent = &entry2[V, E]{v: v, e: e}
+	t, e := c.fun(ctx)
+	if isTempError(e) {
+		return t, e
+	}
 
-	return v, e
+	d := &resultEntry[T]{t: t, e: e}
+	c.ptr.Store(d)
+
+	return t, e
 }
