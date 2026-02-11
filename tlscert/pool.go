@@ -68,9 +68,9 @@ func (m *certificateMatcher) GetCertificate(ch *tls.ClientHelloInfo) (*tls.Certi
 		return crt, nil
 	} else if err != nil {
 		attrs = append(attrs, "match_error", err)
-		m.log.Warn("证书池中匹配到了合适的证书出错", attrs...)
+		m.log.Warn("证书池匹配证书出错", attrs...)
 	} else {
-		m.log.Info("证书池中未匹配到了合适的证书", attrs...)
+		m.log.Info("证书池未匹配到证书", attrs...)
 	}
 
 	// 如果没有拿到合适的证书，就返回自签证书。
