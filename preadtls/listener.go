@@ -121,7 +121,9 @@ func (pl *Listener) enqueue(conn net.Conn) {
 	}
 
 	pc := &peekConn{conn: conn, read: io.MultiReader(buf, conn)}
-	if peek[0] == 0x16 { // TLS 首字符特征
+	// 22 即 TLS Handshake 报文标识。
+	// https://github.com/golang/go/blob/go1.26.0/src/crypto/tls/common.go#L74-L82
+	if peek[0] == 22 { // 22 == 0x16
 		err = pl.tls.enqueue(pc, timeout)
 	} else {
 		err = pl.tcp.enqueue(pc, timeout)
