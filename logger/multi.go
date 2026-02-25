@@ -7,105 +7,107 @@ import (
 	"sync/atomic"
 )
 
-type Handler interface {
-	slog.Handler
-	Append(...slog.Handler)
-	Remove(...slog.Handler)
-	Replace(...slog.Handler)
+func NewMultiHandler(hs ...slog.Handler) *MultiHandler {
+	m := new(MultiHandler)
+	m.Replace(hs...)
+
+	return m
 }
 
-func NewMultiHandler(hs ...slog.Handler) Handler {
-	mh := new(multiHandler)
-	mh.Replace(hs...)
-
-	return mh
+type MultiHandler struct {
+	holder atomic.Pointer[slog.MultiHandler]
+	mutex  sync.Mutex
+	order  []slog.Handler            // 保证输出顺序
+	unique map[slog.Handler]struct{} // 保证不重复
 }
 
-type multiHandler struct {
-	mtx sync.Mutex
-	out map[slog.Handler]struct{}
-	ptr atomic.Pointer[slog.MultiHandler]
+func (m *MultiHandler) Enabled(ctx context.Context, level slog.Level) bool {
+	return m.load().Enabled(ctx, level)
 }
 
-func (h *multiHandler) Enabled(ctx context.Context, level slog.Level) bool {
-	return h.load().Enabled(ctx, level)
+func (m *MultiHandler) Handle(ctx context.Context, record slog.Record) error {
+	return m.load().Handle(ctx, record)
 }
 
-func (h *multiHandler) Handle(ctx context.Context, record slog.Record) error {
-	return h.load().Handle(ctx, record)
+func (m *MultiHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
+	return m.load().WithAttrs(attrs)
 }
 
-func (h *multiHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
-	return h.load().WithAttrs(attrs)
+func (m *MultiHandler) WithGroup(name string) slog.Handler {
+	return m.load().WithGroup(name)
 }
 
-func (h *multiHandler) WithGroup(name string) slog.Handler {
-	return h.load().WithGroup(name)
-}
+func (m *MultiHandler) Append(hs ...slog.Handler) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 
-func (h *multiHandler) Append(hs ...slog.Handler) {
-	h.mtx.Lock()
-	defer h.mtx.Unlock()
-
-	if h.out == nil {
-		h.out = make(map[slog.Handler]struct{}, 8)
-	}
-	for _, mh := range hs {
-		if mh != nil {
-			h.out[mh] = struct{}{}
-		}
+	if m.unique == nil {
+		m.unique = make(map[slog.Handler]struct{}, len(hs))
 	}
 
-	h.replace(h.out)
-}
-
-func (h *multiHandler) Remove(hs ...slog.Handler) {
-	h.mtx.Lock()
-	defer h.mtx.Unlock()
-
-	for _, mh := range hs {
-		delete(h.out, mh)
-	}
-
-	h.replace(h.out)
-}
-
-func (h *multiHandler) Replace(hs ...slog.Handler) {
-	out := make(map[slog.Handler]struct{}, len(hs))
-	arr := make([]slog.Handler, 0, len(hs))
-	for _, mh := range hs {
-		if mh == nil {
+	for _, h := range hs {
+		if h == nil {
 			continue
 		}
-		if _, exists := out[mh]; exists {
+		if _, ok := m.unique[h]; ok {
 			continue
 		}
 
-		out[mh] = struct{}{}
-		arr = append(arr, mh)
+		m.unique[h] = struct{}{}
+		m.order = append(m.order, h)
 	}
 
-	h.mtx.Lock()
-	defer h.mtx.Unlock()
-	h.out = out
-	mh := slog.NewMultiHandler(hs...)
-	h.ptr.Store(mh)
+	m.holder.Store(slog.NewMultiHandler(m.order...))
 }
 
-func (h *multiHandler) load() *slog.MultiHandler {
-	if mh := h.ptr.Load(); mh != nil {
-		return mh
+func (m *MultiHandler) Remove(hs ...slog.Handler) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	for _, h := range hs {
+		if _, ok := m.unique[h]; !ok {
+			continue
+		}
+
+		delete(m.unique, h)
+		for i, v := range m.order {
+			if v == h {
+				m.order = append(m.order[:i], m.order[i+1:]...)
+				break
+			}
+		}
 	}
+
+	m.holder.Store(slog.NewMultiHandler(m.order...))
+}
+
+func (m *MultiHandler) Replace(hs ...slog.Handler) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+
+	unique := make(map[slog.Handler]struct{}, len(hs))
+	order := make([]slog.Handler, 0, len(hs))
+	for _, h := range hs {
+		if h == nil {
+			continue
+		}
+		if _, ok := unique[h]; ok {
+			continue
+		}
+
+		order = append(order, h)
+		unique[h] = struct{}{}
+	}
+
+	m.order = order
+	m.unique = unique
+	m.holder.Store(slog.NewMultiHandler(order...))
+}
+
+func (m *MultiHandler) load() *slog.MultiHandler {
+	if h := m.holder.Load(); h != nil {
+		return h
+	}
+
 	return slog.NewMultiHandler()
-}
-
-func (h *multiHandler) replace(out map[slog.Handler]struct{}) {
-	hs := make([]slog.Handler, 0, len(out))
-	for k := range out {
-		hs = append(hs, k)
-	}
-
-	h.out = out
-	mh := slog.NewMultiHandler(hs...)
-	h.ptr.Store(mh)
 }
