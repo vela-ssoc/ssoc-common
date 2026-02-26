@@ -32,8 +32,6 @@ type Certificate struct {
 
 func (Certificate) CollectionName() string { return "certificate" }
 
-type Certificates []*Certificate
-
 type CertificatePKIXName struct {
 	Country            []string `json:"country"             bson:"country"`
 	Organization       []string `json:"organization"        bson:"organization"`

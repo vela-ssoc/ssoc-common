@@ -11,6 +11,7 @@ import (
 
 type Certificate interface {
 	Repository[model.Certificate]
+	Enables(ctx context.Context) ([]*model.Certificate, error)
 }
 
 func NewCertificate(db *mongo.Database, opts ...options.Lister[options.CollectionOptions]) Certificate {
@@ -30,4 +31,9 @@ func (r *certificateRepo) CreateIndex(ctx context.Context, opts ...options.Liste
 	}
 
 	return r.Indexes().CreateMany(ctx, indexes, opts...)
+}
+
+func (r *certificateRepo) Enables(ctx context.Context) ([]*model.Certificate, error) {
+	filter := bson.D{{Key: "enabled", Value: true}}
+	return r.Find(ctx, filter)
 }
