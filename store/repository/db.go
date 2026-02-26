@@ -15,6 +15,7 @@ type Database interface {
 
 	Broker() Broker
 	BrokerConnectHistory() BrokerConnectHistory
+	Certificate() Certificate
 	LokiConfig() LokiConfig
 	PyroscopeConfig() PyroscopeConfig
 	VictoriaMetricsConfig() VictoriaMetricsConfig
@@ -26,6 +27,7 @@ func NewDB(db *mongo.Database, log *slog.Logger) Database {
 		log:                   log,
 		broker:                NewBroker(db),
 		brokerConnectHistory:  NewBrokerConnectHistory(db),
+		certificate:           NewCertificate(db),
 		lokiConfig:            NewLokiConfig(db),
 		pyroscopeConfig:       NewPyroscopeConfig(db),
 		victoriaMetricsConfig: NewVictoriaMetricsConfig(db),
@@ -38,6 +40,7 @@ type mongoDB struct {
 
 	broker                Broker
 	brokerConnectHistory  BrokerConnectHistory
+	certificate           Certificate
 	lokiConfig            LokiConfig
 	pyroscopeConfig       PyroscopeConfig
 	victoriaMetricsConfig VictoriaMetricsConfig
@@ -46,6 +49,7 @@ type mongoDB struct {
 func (r *mongoDB) Database() *mongo.Database                    { return r.db }
 func (r *mongoDB) Broker() Broker                               { return r.broker }
 func (r *mongoDB) BrokerConnectHistory() BrokerConnectHistory   { return r.brokerConnectHistory }
+func (r *mongoDB) Certificate() Certificate                     { return r.certificate }
 func (r *mongoDB) LokiConfig() LokiConfig                       { return r.lokiConfig }
 func (r *mongoDB) PyroscopeConfig() PyroscopeConfig             { return r.pyroscopeConfig }
 func (r *mongoDB) VictoriaMetricsConfig() VictoriaMetricsConfig { return r.victoriaMetricsConfig }
