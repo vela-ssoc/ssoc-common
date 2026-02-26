@@ -9,11 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/vela-ssoc/ssoc-common/validation"
 	"github.com/vela-ssoc/ssoc-proto/muxtool"
 	"github.com/xgfone/ship/v5"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 func NotFound(_ *ship.Context) error {
@@ -22,11 +21,12 @@ func NotFound(_ *ship.Context) error {
 
 func HandleError(c *ship.Context, e error) {
 	pd := &muxtool.ProblemDetails{
-		Type:     c.Host(),
-		Title:    "请求错误",
-		Status:   http.StatusBadRequest,
-		Detail:   e.Error(),
+		Host:     c.Host(),
+		Method:   c.Method(),
 		Instance: c.RequestURI(),
+		Status:   http.StatusBadRequest,
+		Title:    "请求错误",
+		Detail:   e.Error(),
 	}
 
 	switch err := e.(type) {
@@ -60,24 +60,20 @@ func HandleError(c *ship.Context, e error) {
 			msg = "类型错误：" + err.Num
 		}
 		pd.Detail = msg
-	case *mysql.MySQLError:
-		switch err.Number {
-		case 1062:
-			pd.Detail = "数据已存在"
-		default:
-			c.Errorf("SQL 执行错误：%v", e)
-			pd.Status = http.StatusInternalServerError
-			pd.Detail = "内部错误"
-		}
-	default:
-		switch {
-		case err == gorm.ErrRecordNotFound:
-			pd.Detail = "数据不存在"
+	case mongo.WriteException:
+		for _, we := range err.WriteErrors {
+			switch we.Code {
+			case 11000:
+				pd.Status = http.StatusConflict
+				pd.Title = "数据已存在"
+				pd.Detail = "数据已存在"
+				kv := we.Raw.Lookup("keyValue").String()
+				if kv != "" {
+					pd.Detail += "：" + kv
+				}
+			}
 		}
 	}
-
-	c.SetRespHeader(ship.HeaderContentType, "application/problem+json; charset=utf-8")
-	c.SetRespHeader(ship.HeaderContentLanguage, "zh")
 
 	_ = c.JSON(pd.Status, pd)
 }

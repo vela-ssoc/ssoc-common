@@ -2,17 +2,17 @@ package shipx
 
 import "github.com/xgfone/ship/v5"
 
-type RouteBinder interface {
-	BindRoute(rgb *ship.RouteGroupBuilder) error
+type RouteRegister interface {
+	RegisterRoute(rgb *ship.RouteGroupBuilder) error
 }
 
-func BindRoutes(base *ship.RouteGroupBuilder, rbs []RouteBinder) error {
-	for _, rb := range rbs {
-		if rb == nil {
+func RegisterRoutes(base *ship.RouteGroupBuilder, rrs []RouteRegister) error {
+	for _, rr := range rrs {
+		if rr == nil {
 			continue
 		}
 
-		if err := rb.BindRoute(base); err != nil {
+		if err := rr.RegisterRoute(base); err != nil {
 			return err
 		}
 	}

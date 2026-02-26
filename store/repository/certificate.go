@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"crypto/tls"
 
 	"github.com/vela-ssoc/ssoc-common/store/model"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -11,7 +12,7 @@ import (
 
 type Certificate interface {
 	Repository[model.Certificate]
-	Enables(ctx context.Context) ([]*model.Certificate, error)
+	LoadCertificate(ctx context.Context) ([]*tls.Certificate, error)
 }
 
 func NewCertificate(db *mongo.Database, opts ...options.Lister[options.CollectionOptions]) Certificate {
@@ -33,7 +34,21 @@ func (r *certificateRepo) CreateIndex(ctx context.Context, opts ...options.Liste
 	return r.Indexes().CreateMany(ctx, indexes, opts...)
 }
 
-func (r *certificateRepo) Enables(ctx context.Context) ([]*model.Certificate, error) {
+func (r *certificateRepo) LoadCertificate(ctx context.Context) ([]*tls.Certificate, error) {
 	filter := bson.D{{Key: "enabled", Value: true}}
-	return r.Find(ctx, filter)
+	dats, err := r.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	pairs := make([]*tls.Certificate, 0, len(dats))
+	for _, dat := range dats {
+		pair, err1 := tls.X509KeyPair([]byte(dat.PublicKey), []byte(dat.PrivateKey))
+		if err1 != nil {
+			return nil, err1
+		}
+		pairs = append(pairs, &pair)
+	}
+
+	return pairs, nil
 }

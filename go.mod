@@ -7,7 +7,6 @@ require (
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.30.1
-	github.com/go-sql-driver/mysql v1.9.3
 	github.com/gorilla/websocket v1.5.3
 	github.com/lmittmann/tint v1.1.3
 	github.com/robfig/cron/v3 v3.0.1
@@ -21,13 +20,10 @@ require (
 )
 
 require (
-	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/ebitengine/purego v0.10.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/hashicorp/yamux v0.1.2 // indirect
-	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20260216142805-b3301c5f2a88 // indirect
