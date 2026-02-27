@@ -26,8 +26,8 @@ type Certificate struct {
 	Issuer             CertificatePKIXName `json:"issuer"                bson:"issuer"`
 	Subject            CertificatePKIXName `json:"subject"               bson:"subject"`
 	SignatureAlgorithm string              `json:"signature_algorithm"   bson:"signature_algorithm"`
-	UpdatedAt          time.Time           `json:"updated_at,omitzero"   bson:"updated_at,omitempty"`
 	CreatedAt          time.Time           `json:"created_at,omitzero"   bson:"created_at,omitempty"`
+	UpdatedAt          time.Time           `json:"updated_at,omitzero"   bson:"updated_at,omitempty"`
 }
 
 func (Certificate) CollectionName() string { return "certificate" }
