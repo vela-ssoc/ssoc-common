@@ -19,15 +19,16 @@ type TunnelLibrary struct {
 }
 
 type ExecuteStat struct {
-	Inet       string   `json:"inet,omitzero"       bson:"inet,omitempty"`
-	Goos       string   `json:"goos,omitzero"       bson:"goos,omitempty"`
-	Goarch     string   `json:"goarch,omitzero"     bson:"goarch,omitempty"`
-	Semver     string   `json:"semver,omitzero"     bson:"semver,omitempty"`
-	PID        int      `json:"pid,omitzero"        bson:"pid,omitempty"`
-	Args       []string `json:"args,omitzero"       bson:"args,omitempty"`
-	Hostname   string   `json:"hostname,omitzero"   bson:"hostname,omitempty"`
-	Workdir    string   `json:"workdir,omitzero"    bson:"workdir,omitempty"`
-	Executable string   `json:"executable,omitzero" bson:"executable,omitempty"`
+	Inet       string   `bson:"inet,omitempty"       json:"inet,omitzero"`
+	Goos       string   `bson:"goos,omitempty"       json:"goos,omitzero"`
+	Goarch     string   `bson:"goarch,omitempty"     json:"goarch,omitzero"`
+	Semver     string   `bson:"semver"               json:"semver"`
+	Version    uint64   `bson:"version"              json:"version"`
+	PID        int      `bson:"pid,omitempty"        json:"pid,omitzero"`
+	Args       []string `bson:"args,omitempty"       json:"args,omitzero"`
+	Hostname   string   `bson:"hostname,omitempty"   json:"hostname,omitzero"`
+	Workdir    string   `bson:"workdir,omitempty"    json:"workdir,omitzero"`
+	Executable string   `bson:"executable,omitempty" json:"executable,omitzero"`
 }
 
 type TunnelStatHistory struct {
