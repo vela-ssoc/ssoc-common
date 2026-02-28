@@ -33,6 +33,7 @@ type ExecuteStat struct {
 }
 
 type TunnelStatHistory struct {
+	Inet           string        `bson:"inet"                      json:"inet,omitzero"`
 	ConnectedAt    time.Time     `bson:"connected_at,omitempty"    json:"connected_at,omitzero"`
 	DisconnectedAt time.Time     `bson:"disconnected_at,omitempty" json:"disconnected_at,omitzero"`
 	ConnectSeconds uint64        `bson:"connect_seconds"           json:"connect_seconds,omitzero"` // 连接持续时长秒数
