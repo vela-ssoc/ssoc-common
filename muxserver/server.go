@@ -3,7 +3,7 @@ package muxserver
 import (
 	"context"
 	"io"
-	"net"
+	"net/http"
 	"sync/atomic"
 	"time"
 
@@ -18,7 +18,7 @@ type MUXAccepter interface {
 	// 主要由 broker 方实现，manager 无需实现该接口。
 	//
 	// Deprecated: use AcceptMUX.
-	AcceptTCP(conn net.Conn) error
+	AcceptTCP(w http.ResponseWriter, r *http.Request) error
 }
 
 type BootLoader[T any] interface {
