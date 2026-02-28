@@ -25,6 +25,13 @@ func NewBrokerHub() Huber {
 	}
 }
 
+func NewAgentHub() Huber {
+	return &mapHub{
+		domain: muxproto.AgentDomain,
+		peers:  make(map[string]Peer, 32),
+	}
+}
+
 type mapHub struct {
 	domain string
 	mutex  sync.RWMutex
