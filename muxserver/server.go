@@ -3,6 +3,7 @@ package muxserver
 import (
 	"context"
 	"io"
+	"net"
 	"sync/atomic"
 	"time"
 
@@ -10,7 +11,14 @@ import (
 )
 
 type MUXAccepter interface {
-	AcceptMUX(mux muxconn.Muxer)
+	// AcceptMUX v2 接口。
+	AcceptMUX(mux muxconn.Muxer) error
+
+	// AcceptTCP 兼容 v1 agent 上线的接口。
+	// 主要由 broker 方实现，manager 无需实现该接口。
+	//
+	// Deprecated: use AcceptMUX.
+	AcceptTCP(conn net.Conn) error
 }
 
 type BootLoader[T any] interface {
