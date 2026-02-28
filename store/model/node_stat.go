@@ -19,6 +19,10 @@ type TunnelLibrary struct {
 	Module string `bson:"module,omitempty" json:"module,omitzero"`
 }
 
+func (tl TunnelLibrary) IsZero() bool {
+	return tl.Name != "" && tl.Module == ""
+}
+
 type ExecuteStat struct {
 	Goos       string   `bson:"goos,omitempty"       json:"goos,omitzero"`
 	Goarch     string   `bson:"goarch,omitempty"     json:"goarch,omitzero"`
