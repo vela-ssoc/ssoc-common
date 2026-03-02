@@ -54,17 +54,18 @@ func (m MinionTagType) String() string {
 }
 
 type Minion struct {
-	ID          bson.ObjectID `bson:"_id,omitempty"          json:"id"`
-	MachineID   string        `bson:"machine_id"             json:"machine_id"`
-	Inet        string        `bson:"inet"                   json:"inet"`
-	Status      MinionStatus  `bson:"status"                 json:"status"`
-	Tags        MinionTags    `bson:"tags"                   json:"tags"`   // 节点标签，配置下发。
-	Unload      bool          `bson:"unload"                 json:"unload"` // 此模式开启，此节点不会加载任何配置。
-	TunnelStat  *TunnelStat   `bson:"tunnel_stat,omitempty"  json:"tunnel_stat,omitzero"`
-	ExecuteStat *ExecuteStat  `bson:"execute_stat,omitempty" json:"execute_stat,omitzero"`
-	CMDB        *MinionCMDB   `bson:"cmdb,omitempty"         json:"cmdb,omitempty"`
-	CreatedAt   time.Time     `bson:"created_at,omitempty"   json:"created_at"`
-	UpdatedAt   time.Time     `bson:"updated_at,omitempty"   json:"updated_at"`
+	ID          bson.ObjectID  `bson:"_id,omitempty"          json:"id"`
+	MachineID   string         `bson:"machine_id"             json:"machine_id"`
+	Inet        string         `bson:"inet"                   json:"inet"`
+	Status      MinionStatus   `bson:"status"                 json:"status"`
+	Tags        MinionTags     `bson:"tags"                   json:"tags"`   // 节点标签，配置下发。
+	Unload      bool           `bson:"unload"                 json:"unload"` // 此模式开启，此节点不会加载任何配置。
+	TunnelStat  *TunnelStat    `bson:"tunnel_stat,omitempty"  json:"tunnel_stat,omitzero"`
+	ExecuteStat *ExecuteStat   `bson:"execute_stat,omitempty" json:"execute_stat,omitzero"`
+	SysInfo     *MinionSysInfo `bson:"sys_info,omitempty"     json:"sys_info,omitzero"` // 由 agent 上报
+	CMDB        *MinionCMDB    `bson:"cmdb,omitempty"         json:"cmdb,omitempty"`
+	CreatedAt   time.Time      `bson:"created_at,omitempty"   json:"created_at"`
+	UpdatedAt   time.Time      `bson:"updated_at,omitempty"   json:"updated_at"`
 }
 
 func (Minion) CollectionName() string { return "minion" }
@@ -72,4 +73,25 @@ func (Minion) CollectionName() string { return "minion" }
 // MinionCMDB 节点 CMDB 简要信息，辅助搜索与。
 type MinionCMDB struct {
 	Comment string `bson:"comment" json:"comment"`
+}
+
+type MinionSysInfo struct {
+	Release       string `bson:"release"        json:"release"`    // 发行版
+	CPUCore       int    `bson:"cpu_core"       json:"cpu_core"`   // CPU 核数
+	MemTotal      int    `bson:"mem_total"      json:"mem_total"`  // 内存总大小
+	MemFree       int    `bson:"mem_free"       json:"mem_free"`   // 空闲内存
+	SwapTotal     int    `bson:"swap_total"     json:"swap_total"` // 交换分区总大小
+	SwapFree      int    `bson:"swap_free"      json:"swap_free"`  // 空闲交换分区
+	HostID        string `bson:"host_id"        json:"host_id"`
+	Family        string `bson:"family"         json:"family"`
+	Uptime        int64  `bson:"uptime"         json:"uptime"`
+	BootAt        int64  `bson:"boot_at"        json:"boot_at"`
+	Virtual       string `bson:"virtual"        json:"virtual"`
+	VirtualRole   string `bson:"virtual_role"   json:"virtual_role"`
+	ProcNumber    int    `bson:"proc_number"    json:"proc_number"`
+	Hostname      string `bson:"hostname"       json:"hostname"`
+	CPUModel      string `bson:"cpu_model"      json:"cpu_model"`
+	AgentTotal    int    `bson:"agent_total"    json:"agent_total"`
+	AgentAlloc    int    `bson:"agent_alloc"    json:"agent_alloc"`
+	KernelVersion string `bson:"kernel_version" json:"kernel_version"`
 }
