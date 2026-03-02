@@ -9,8 +9,8 @@ require (
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/lmittmann/tint v1.1.3
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/shirou/gopsutil/v4 v4.26.1
-	github.com/vela-ssoc/ssoc-proto v0.0.0-20260227111052-cf550b0089ef
+	github.com/shirou/gopsutil/v4 v4.26.2
+	github.com/vela-ssoc/ssoc-proto v0.0.0-20260228100601-402b0ce97364
 	github.com/xgfone/ship/v5 v5.3.2
 	github.com/xtaci/smux v1.5.56
 	go.mongodb.org/mongo-driver/v2 v2.5.0

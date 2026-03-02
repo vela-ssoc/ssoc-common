@@ -15,7 +15,7 @@ type Peer interface {
 }
 
 type PeerInfo struct {
-	Name        string    `json:"name"`
+	Instance    string    `json:"instance"`
 	Semver      string    `json:"semver"`
 	Inet        string    `json:"inet"`
 	Goos        string    `json:"goos"`

@@ -56,6 +56,7 @@ func (m MinionTagType) String() string {
 type Minion struct {
 	ID          bson.ObjectID `bson:"_id,omitempty"          json:"id"`
 	MachineID   string        `bson:"machine_id"             json:"machine_id"`
+	Inet        string        `bson:"inet"                   json:"inet"`
 	Status      MinionStatus  `bson:"status"                 json:"status"`
 	Tags        MinionTags    `bson:"tags"                   json:"tags"`   // 节点标签，配置下发。
 	Unload      bool          `bson:"unload"                 json:"unload"` // 此模式开启，此节点不会加载任何配置。
