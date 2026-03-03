@@ -44,6 +44,9 @@ func (mts MinionTags) ReplaceAllSystemTags(newSystemTags ...string) MinionTags {
 	}
 
 	for _, mt := range mts {
+		if mt.Type == MinionTagSystem {
+			continue
+		}
 		tag := strings.TrimSpace(mt.Name)
 		if tag == "" {
 			continue

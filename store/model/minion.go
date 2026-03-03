@@ -58,8 +58,9 @@ type Minion struct {
 	MachineID   string         `bson:"machine_id"             json:"machine_id"`
 	Inet        string         `bson:"inet"                   json:"inet"`
 	Status      MinionStatus   `bson:"status"                 json:"status"`
-	Tags        MinionTags     `bson:"tags"                   json:"tags"`   // 节点标签，配置下发。
-	Unload      bool           `bson:"unload"                 json:"unload"` // 此模式开启，此节点不会加载任何配置。
+	Broker      MinionBroker   `bson:"broker,omitzero"        json:"broker,omitzero"` // agent 所连接的 broker。
+	Tags        MinionTags     `bson:"tags"                   json:"tags"`            // 节点标签，配置下发。
+	Unload      bool           `bson:"unload"                 json:"unload"`          // 此模式开启，此节点不会加载任何配置。
 	TunnelStat  *TunnelStat    `bson:"tunnel_stat,omitempty"  json:"tunnel_stat,omitzero"`
 	ExecuteStat *ExecuteStat   `bson:"execute_stat,omitempty" json:"execute_stat,omitzero"`
 	SysInfo     *MinionSysInfo `bson:"sys_info,omitempty"     json:"sys_info,omitzero"` // 由 agent 上报
@@ -69,6 +70,15 @@ type Minion struct {
 }
 
 func (Minion) CollectionName() string { return "minion" }
+
+type MinionBroker struct {
+	ID   bson.ObjectID `bson:"id,omitempty"   json:"id,omitzero"`
+	Name string        `bson:"name,omitempty" json:"name,omitzero"`
+}
+
+func (b MinionBroker) IsZero() bool {
+	return b.ID.IsZero() && b.Name == ""
+}
 
 // MinionCMDB 节点 CMDB 简要信息，辅助搜索与。
 type MinionCMDB struct {

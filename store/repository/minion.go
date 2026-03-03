@@ -28,6 +28,7 @@ func (r *minionRepo) CreateIndex(ctx context.Context, opts ...options.Lister[opt
 		{Keys: bson.D{{Key: "machine_id", Value: 1}}, Options: options.Index().SetUnique(true)},
 		{Keys: bson.D{{Key: "inet", Value: 1}}},
 		{Keys: bson.D{{Key: "tags.name", Value: 1}}},
+		{Keys: bson.D{{Key: "broker.id", Value: 1}}},
 	}
 
 	return r.Indexes().CreateMany(ctx, indexes, opts...)

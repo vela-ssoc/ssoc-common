@@ -5,6 +5,7 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 type MinionConnectHistory struct {
 	ID          bson.ObjectID     `bson:"_id,omitempty"    json:"id"`
 	MinionID    bson.ObjectID     `bson:"minion_id"        json:"minion_id"`
+	Broker      MinionBroker      `bson:"broker,omitzero"  json:"broker"`
 	ExecuteStat ExecuteStat       `bson:"execute_stat"     json:"execute_stat"`
 	TunnelStat  TunnelStatHistory `bson:"tunnel_stat"      json:"tunnel_stat"`
 }
