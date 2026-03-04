@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/vela-ssoc/ssoc-proto/muxconn"
-	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type MUXAccepter interface {
@@ -24,11 +23,6 @@ type MUXAccepter interface {
 
 type BootLoader[T any] interface {
 	LoadBoot(ctx context.Context) (*T, error)
-}
-
-// ThisBroker 获取当前节点。
-type ThisBroker interface {
-	This(ctx context.Context) (id bson.ObjectID, name string, err error)
 }
 
 type ConnectNotifier interface {
