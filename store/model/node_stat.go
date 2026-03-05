@@ -42,6 +42,7 @@ type TunnelStatHistory struct {
 	ConnectedAt    time.Time     `bson:"connected_at,omitempty"    json:"connected_at,omitzero"`
 	DisconnectedAt time.Time     `bson:"disconnected_at,omitempty" json:"disconnected_at,omitzero"`
 	ConnectSeconds uint64        `bson:"connect_seconds"           json:"connect_seconds,omitzero"` // 连接持续时长秒数
+	Cumulative     int64         `bson:"cumulative,omitempty"      json:"cumulative,omitzero"`      // 累计子流建立个数
 	Library        TunnelLibrary `bson:"library,omitempty"         json:"library,omitzero"`
 	LocalAddr      string        `bson:"local_addr,omitempty"      json:"local_addr,omitzero"`
 	RemoteAddr     string        `bson:"remote_addr,omitempty"     json:"remote_addr,omitzero"`
