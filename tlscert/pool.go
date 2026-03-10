@@ -124,6 +124,9 @@ func (m *certificateMatcher) slowLoadPool(parent context.Context) *certificatePo
 	}
 
 	pool := &certificatePool{certs: make(map[string][]*tls.Certificate, 16)}
+	if m.load == nil { // 允许 load 为 nil
+		return pool
+	}
 
 	ctx, cancel := context.WithTimeout(parent, time.Minute)
 	defer cancel()
