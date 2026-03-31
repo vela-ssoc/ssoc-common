@@ -11,7 +11,7 @@ import (
 
 type CollectionNamer interface {
 	// CollectionName 集合名。
-	// 注意：该方法不应该存在复杂的逻辑，不应该依赖 struct 内部的状态。
+	// 注意：该方法应该支持 nil 调用。
 	CollectionName() string
 }
 
@@ -190,11 +190,11 @@ func (r *baseRepository[T]) Drop(ctx context.Context, opts ...options.Lister[opt
 }
 
 func (r *baseRepository[T]) FindByID(ctx context.Context, id any, opts ...options.Lister[options.FindOneOptions]) (*T, error) {
-	return r.FindOne(ctx, bson.E{Key: "_id", Value: id}, opts...)
+	return r.FindOne(ctx, bson.D{{"_id", id}}, opts...)
 }
 
 func (r *baseRepository[T]) DeleteByID(ctx context.Context, id any, opts ...options.Lister[options.DeleteOneOptions]) (*mongo.DeleteResult, error) {
-	return r.DeleteOne(ctx, bson.E{Key: "_id", Value: id}, opts...)
+	return r.DeleteOne(ctx, bson.D{{"_id", id}}, opts...)
 }
 
 func (r *baseRepository[T]) DistinctString(ctx context.Context, fieldName string, filter any, opts ...options.Lister[options.DistinctOptions]) ([]string, error) {
