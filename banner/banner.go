@@ -17,7 +17,12 @@ import (
 // 何为 ANSI 转义序列：https://en.wikipedia.org/wiki/ANSI_escape_code
 func ANSI(w io.Writer) (int, error) {
 	parseOnce()
-	return fmt.Fprintf(w, ansiLogo, buildPath, version, pid, goos, arch, hostname,
+	ver := "v" + version
+	if version == "" {
+		ver = "v0.0.0"
+	}
+
+	return fmt.Fprintf(w, ansiLogo, buildPath, ver, pid, goos, arch, hostname,
 		username, workdir, compileAt, commitAt, buildPath, revision)
 }
 
@@ -84,8 +89,15 @@ func parse() {
 			revision = val
 		case "vcs.time":
 			commitAt = parseTime(val)
-			version = commitAt.UTC().Format("06.1.2-t150405")
+			version = commitAt.UTC().Format("06.1.2") // yy.MM.dd
 		}
+	}
+	if revision != "" && version != "" {
+		metadata := revision
+		if len(revision) > 7 {
+			metadata = revision[:7]
+		}
+		version = version + "+" + metadata
 	}
 }
 
