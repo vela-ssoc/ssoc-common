@@ -13,7 +13,7 @@ require (
 	github.com/vela-ssoc/ssoc-proto v0.0.0-20260330065539-1301b5724eac
 	github.com/xgfone/ship/v5 v5.3.2
 	github.com/xtaci/smux v1.5.57
-	go.mongodb.org/mongo-driver/v2 v2.5.0
+	go.mongodb.org/mongo-driver/v2 v2.5.1
 	golang.org/x/time v0.15.0
 )
 
