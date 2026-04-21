@@ -3,7 +3,7 @@ module github.com/vela-ssoc/ssoc-common
 go 1.26
 
 require (
-	github.com/VictoriaMetrics/metrics v1.43.1
+	github.com/VictoriaMetrics/metrics v1.43.2
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.30.2
