@@ -10,7 +10,7 @@ require (
 	github.com/lmittmann/tint v1.1.3
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil/v4 v4.26.3
-	github.com/vela-ssoc/ssoc-proto v0.0.0-20260330065539-1301b5724eac
+	github.com/vela-ssoc/ssoc-proto v0.0.0-20260421023730-9cc8157f8c14
 	github.com/xgfone/ship/v5 v5.3.2
 	github.com/xtaci/smux v1.5.57
 	go.mongodb.org/mongo-driver/v2 v2.5.1
